@@ -192,7 +192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraPointerManager
   pointer: {fileID: 3155357006190120358}
-  maxDistancePointer: 4.5
+  maxDistancePointer: 2
   disPointerObject: 0.95
   hitPoint: {x: 0, y: 0, z: 0}
 --- !u!1 &8528431863075186039
@@ -260,15 +260,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2305158326965436007, guid: 2f0432d3a9594db438d41ca88128c4a1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.28958
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2305158326965436007, guid: 2f0432d3a9594db438d41ca88128c4a1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2305158326965436007, guid: 2f0432d3a9594db438d41ca88128c4a1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.46921
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2305158326965436007, guid: 2f0432d3a9594db438d41ca88128c4a1, type: 3}
       propertyPath: m_LocalRotation.w
