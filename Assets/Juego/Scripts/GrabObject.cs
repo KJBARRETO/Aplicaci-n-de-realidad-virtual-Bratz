@@ -33,7 +33,8 @@ public class GrabObject : MonoBehaviour
     //El script GrabManager esta en un Empy
     //-----------------------------------------------------------------------//
     {
-        player.PlayOneShot(soundGrab);
+        if (soundGrab != null)
+            player.PlayOneShot(soundGrab);
         if (grabManager.heldItem != null)
         {
             grabManager.heldItem.GetComponent<GrabObject>().Drop();
@@ -69,7 +70,8 @@ public class GrabObject : MonoBehaviour
 
     public void Place(Vector3 position)
     {
-        player.PlayOneShot(soundPlace);
+        if (soundPlace != null)
+            player.PlayOneShot(soundPlace);
         transform.position = position;
         grabManager.heldItem = null;
         boxCollider.enabled = true;

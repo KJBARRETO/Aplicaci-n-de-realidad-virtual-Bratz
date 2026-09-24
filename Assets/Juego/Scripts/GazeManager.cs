@@ -31,8 +31,8 @@ public class GazeManager : MonoBehaviour
     private bool runTimer;
     void Start()
     {
-        gazeBarCanvas.SetActive(false);
-        fillIndicator.fillAmount = Normalise();
+        gazeBarCanvas.SetActive(true);
+        fillIndicator.fillAmount = 0;
     }
 
 
@@ -57,10 +57,10 @@ public class GazeManager : MonoBehaviour
 
     public void CancelGazeSelection()
     {
-        gazeBarCanvas.SetActive(false);
         runTimer = false;
         timeProggres = 0;
         timeCounter = 0;
+        fillIndicator.fillAmount = 0;
     }
 
     private void AddValue(float val) 
