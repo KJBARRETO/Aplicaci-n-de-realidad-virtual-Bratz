@@ -93,7 +93,7 @@ public class CameraPointerManager : MonoBehaviour
 
         private void PointerOutGaze()
         {
-            pointer.transform.localScale = Vector3.one * 0.1f;
+            pointer.transform.localScale = Vector3.one * 0.035f;
             pointer.transform.parent.transform.localPosition = new Vector3(0, 0, maxDistancePointer);
             pointer.transform.parent.parent.transform.rotation = transform.rotation;
             GazeManager.Instance.CancelGazeSelection();
