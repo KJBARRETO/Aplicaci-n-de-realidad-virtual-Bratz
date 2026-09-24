@@ -9,6 +9,7 @@ public class TeleportPoint : MonoBehaviour
     public UnityEvent OnTeleportEnter;
     public UnityEvent OnTeleport;
     public UnityEvent OnTeleportExit;
+    public Transform destination;
 
     void Start()
     {
@@ -37,9 +38,10 @@ public class TeleportPoint : MonoBehaviour
     private void ExecuteTeleportation()
     {
         GameObject player = TeleportManager.Instance.Player;
-        player.transform.position = transform.position;
+        Transform target = destination != null ? destination : transform;
+        player.transform.position = target.position;
         Camera camera = player.GetComponentInChildren<Camera>();
-        float rotY = transform.rotation.eulerAngles.y - camera.transform.localEulerAngles.y;
+        float rotY = target.rotation.eulerAngles.y - camera.transform.localEulerAngles.y;
         player.transform.rotation = Quaternion.Euler(0, rotY, 0);
     }
 
