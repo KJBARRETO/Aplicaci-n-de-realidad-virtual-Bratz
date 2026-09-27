@@ -1,7 +1,20 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SalirAplicacion : MonoBehaviour
 {
+    void Start()
+    {
+        Button boton = GetComponent<Button>();
+        if (boton != null)
+            boton.onClick.AddListener(SalirDelJuego);
+    }
+
+    public void OnPointerClickXR()
+    {
+        SalirDelJuego();
+    }
+
     public void SalirDelJuego()
     {
         // Cierra la aplicación compilada

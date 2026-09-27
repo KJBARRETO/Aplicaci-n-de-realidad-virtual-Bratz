@@ -46,44 +46,129 @@ public class CameraPointerManager : MonoBehaviour
 
    public void Update()
    {
-        RaycastHit hit;
-        if (BuscarObjetivo(out hit))
+        GameObject objetivo = null;
+        Vector3 punto = transform.position + transform.forward;
+
+        if (BuscarBotonEnPantalla(out GameObject boton, out Vector3 puntoBoton))
         {
-           hitPoint = hit.point;
+            objetivo = boton;
+            punto = puntoBoton;
+        }
+        else if (BuscarObjetivo(out RaycastHit hit))
+        {
+            objetivo = hit.transform.gameObject;
+            punto = hit.point;
+        }
 
-            if (_gazedAtObject != hit.transform.gameObject)
+        if (objetivo != null && objetivo.CompareTag(interactableTag))
+        {
+            hitPoint = punto;
+            if (_gazedAtObject != objetivo)
             {
-                
-                _gazedAtObject?.SendMessage("OnPointerExitXR",  null, SendMessageOptions.DontRequireReceiver);
-                _gazedAtObject = hit.transform.gameObject;
+                _gazedAtObject?.SendMessage("OnPointerExitXR", null, SendMessageOptions.DontRequireReceiver);
+                _gazedAtObject = objetivo;
+                if (GazeManager.Instance != null)
+                    GazeManager.Instance.StartGazeSelection();
+                PonerCirculoDelante();
                 _gazedAtObject.SendMessage("OnPointerEnterXR", null, SendMessageOptions.DontRequireReceiver);
-                GazeManager.Instance.StartGazeSelection();
-            }
-
-            if (hit.transform.CompareTag(interactableTag))
-            {
-                PointerOnGaze(hit.point);
             }
             else
             {
-                PointerOutGaze();
+                PonerCirculoDelante();
             }
+            PointerOnGaze(punto);
         }
         else
         {
-            
             _gazedAtObject?.SendMessage("OnPointerExitXR", null, SendMessageOptions.DontRequireReceiver);
             _gazedAtObject = null;
             PointerOutGaze();
         }
 
-        
         if (Google.XR.Cardboard.Api.IsTriggerPressed)
         {
             _gazedAtObject?.SendMessage("OnPointerClickXR", null, SendMessageOptions.DontRequireReceiver);
         }
 
           }
+
+        private void PonerCirculoDelante()
+        {
+            if (pointer == null)
+                return;
+            Canvas lienzo = pointer.GetComponentInChildren<Canvas>(true);
+            if (lienzo == null)
+                return;
+            lienzo.overrideSorting = true;
+            lienzo.sortingOrder = 500;
+        }
+
+        private bool BuscarBotonEnPantalla(out GameObject boton, out Vector3 punto)
+        {
+            boton = null;
+            punto = Vector3.zero;
+            Camera camara = GetComponent<Camera>();
+            if (camara == null)
+                return false;
+
+            Vector2 centro = camara.ViewportToScreenPoint(new Vector3(0.5f, 0.5f, 0f));
+            float mejor = float.MaxValue;
+            UiElementXR[] botones = FindObjectsByType<UiElementXR>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+            for (int i = 0; i < botones.Length; i++)
+            {
+                UiElementXR elemento = botones[i];
+                if (elemento == null || !elemento.isActiveAndEnabled)
+                    continue;
+                if (!elemento.CompareTag(interactableTag))
+                    continue;
+
+                RectTransform rect = elemento.transform as RectTransform;
+                if (rect == null)
+                    continue;
+
+                Vector3[] esquinas = new Vector3[4];
+                rect.GetWorldCorners(esquinas);
+                if (!CentroDentro(camara, centro, esquinas, out float profundidad))
+                    continue;
+                if (profundidad >= mejor)
+                    continue;
+
+                mejor = profundidad;
+                boton = elemento.gameObject;
+                punto = rect.position;
+            }
+
+            return boton != null;
+        }
+
+        private static bool CentroDentro(Camera camara, Vector2 centro, Vector3[] esquinas, out float profundidad)
+        {
+            profundidad = 0f;
+            Vector2[] pantalla = new Vector2[4];
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 proyectado = camara.WorldToScreenPoint(esquinas[i]);
+                if (proyectado.z <= 0.01f)
+                    return false;
+                pantalla[i] = proyectado;
+                profundidad += proyectado.z;
+            }
+
+            profundidad *= 0.25f;
+            bool dentro = false;
+            for (int i = 0, j = 3; i < 4; j = i++)
+            {
+                bool cruza = (pantalla[i].y > centro.y) != (pantalla[j].y > centro.y);
+                if (!cruza)
+                    continue;
+                float x = (pantalla[j].x - pantalla[i].x) * (centro.y - pantalla[i].y) / (pantalla[j].y - pantalla[i].y) + pantalla[i].x;
+                if (centro.x < x)
+                    dentro = !dentro;
+            }
+
+            return dentro;
+        }
 
         private bool BuscarObjetivo(out RaycastHit elegido)
         {

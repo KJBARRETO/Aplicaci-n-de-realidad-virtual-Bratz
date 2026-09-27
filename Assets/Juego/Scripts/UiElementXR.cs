@@ -14,7 +14,27 @@ public class UiElementXR : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        xRCamera = CameraPointerManager.Instance.gameObject.GetComponent<Camera>();
+        if (CameraPointerManager.Instance != null)
+            xRCamera = CameraPointerManager.Instance.GetComponent<Camera>();
+        StartCoroutine(AjustarCaja());
+    }
+
+    IEnumerator AjustarCaja()
+    {
+        yield return null;
+        RectTransform rect = GetComponent<RectTransform>();
+        BoxCollider caja = GetComponent<BoxCollider>();
+        if (rect == null || caja == null)
+            yield break;
+
+        Vector2 tamano = rect.rect.size;
+        if (tamano.x < 1f || tamano.y < 1f)
+            tamano = rect.sizeDelta;
+        if (tamano.x < 1f || tamano.y < 1f)
+            yield break;
+
+        caja.size = new Vector3(Mathf.Abs(tamano.x), Mathf.Abs(tamano.y), 20f);
+        caja.center = Vector3.zero;
     }
 
    public void OnPointerClickXR(){
@@ -29,22 +49,30 @@ public class UiElementXR : MonoBehaviour
         ExecuteEvents.Execute(this.gameObject,pointerEvent,ExecuteEvents.pointerClickHandler);
    }
    public void OnPointerEnterXR(){
-    GazeManager.Instance.SetUpGaze(1.5f);
+    if (GazeManager.Instance != null)
+        GazeManager.Instance.SetUpGaze(1.5f);
     OnXRPointerEnter?.Invoke();
-    if (EventSystem.current == null)
-        return;
     PointerEventData pointerEvent = PlacePointer();
+    if (pointerEvent == null)
+        return;
     ExecuteEvents.Execute(this.gameObject,pointerEvent,ExecuteEvents.pointerDownHandler);
    }
    public void OnPointerExitXR(){
-    GazeManager.Instance.SetUpGaze(2.5f);
+    if (GazeManager.Instance != null)
+        GazeManager.Instance.SetUpGaze(2.5f);
     OnXRPointerExit?.Invoke();
-    if (EventSystem.current == null)
-        return;
     PointerEventData pointerEvent = PlacePointer();
+    if (pointerEvent == null)
+        return;
     ExecuteEvents.Execute(this.gameObject,pointerEvent,ExecuteEvents.pointerUpHandler);
    }
    private PointerEventData PlacePointer(){
+    if (EventSystem.current == null || CameraPointerManager.Instance == null)
+        return null;
+    if (xRCamera == null)
+        xRCamera = CameraPointerManager.Instance.GetComponent<Camera>();
+    if (xRCamera == null)
+        return null;
     Vector3 screenPos = xRCamera.WorldToScreenPoint(CameraPointerManager.Instance.hitPoint);
     var pointer = new PointerEventData(EventSystem.current);
     pointer.position = new Vector2 (screenPos.x, screenPos.y);

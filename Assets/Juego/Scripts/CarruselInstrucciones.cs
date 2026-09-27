@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CarruselInstrucciones : MonoBehaviour
@@ -13,11 +14,33 @@ public class CarruselInstrucciones : MonoBehaviour
     bool listo;
     GameObject[] paginas;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Crear()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void EscucharEscenas()
+    {
+        SceneManager.sceneLoaded -= AlCargarEscena;
+        SceneManager.sceneLoaded += AlCargarEscena;
+    }
+
+    static void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
         ConfigurarSiExiste("TextoTutorial");
         ConfigurarSiExiste("marco");
+    }
+
+    void Start()
+    {
+        Transform raiz = transform;
+        Transform padre = transform.parent;
+        while (padre != null)
+        {
+            if (padre.name == "TextoTutorial" || padre.name == "marco")
+            {
+                raiz = padre;
+                break;
+            }
+            padre = padre.parent;
+        }
+        Configurar(raiz);
     }
 
     public void Configurar(Transform raiz)
