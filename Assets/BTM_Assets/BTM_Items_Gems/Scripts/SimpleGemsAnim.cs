@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 namespace Benjathemaker
@@ -31,9 +32,48 @@ namespace Benjathemaker
         Vector3 escalaGuardada;
         int capaGuardada;
         bool estabaAgarrado;
+        bool flotaEnSitio;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void PrepararEscena()
+        {
+            SceneManager.sceneLoaded -= AlCargarEscena;
+            SceneManager.sceneLoaded += AlCargarEscena;
+        }
+
+        static void AlCargarEscena(Scene escena, LoadSceneMode modo)
+        {
+            GameObject final = GameObject.Find("Final");
+            if (final != null && final.GetComponent<SpriteRenderer>() != null && final.GetComponent<SimpleGemsAnim>() == null)
+                final.AddComponent<SimpleGemsAnim>();
+
+            AudioListener.pause = true;
+            AudioSource[] fuentes = Object.FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < fuentes.Length; i++)
+            {
+                AudioClip clip = fuentes[i].clip;
+                if (clip != null && clip.name.Contains("Gato"))
+                {
+                    fuentes[i].Stop();
+                    fuentes[i].playOnAwake = false;
+                    fuentes[i].clip = null;
+                }
+            }
+            AudioListener.pause = false;
+        }
 
         void Start()
         {
+            flotaEnSitio = gameObject.name == "Baile" || gameObject.name == "Final";
+            if (flotaEnSitio)
+            {
+                isFloating = true;
+                useEasingForFloating = true;
+                floatHeight = 0.35f;
+                floatSpeed = 1.4f;
+                isRotating = false;
+            }
+
             initialScale = transform.localScale;
             initialPosition = transform.position;
             spawnPosition = initialPosition;
@@ -70,7 +110,7 @@ namespace Benjathemaker
                 CambiarColliders(true);
             }
 
-            if (Vector3.Distance(transform.position, spawnPosition) > 0.75f)
+            if (!flotaEnSitio && Vector3.Distance(transform.position, spawnPosition) > 0.75f)
                 return;
 
             if (isRotating)
