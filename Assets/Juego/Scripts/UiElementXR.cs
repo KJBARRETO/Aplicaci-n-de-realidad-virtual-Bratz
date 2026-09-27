@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UiElementXR : MonoBehaviour
 {
@@ -17,18 +18,29 @@ public class UiElementXR : MonoBehaviour
     }
 
    public void OnPointerClickXR(){
+        if (EventSystem.current == null)
+        {
+            Button boton = GetComponent<Button>();
+            if (boton != null && boton.IsActive() && boton.IsInteractable())
+                boton.onClick.Invoke();
+            return;
+        }
         PointerEventData pointerEvent = PlacePointer();
         ExecuteEvents.Execute(this.gameObject,pointerEvent,ExecuteEvents.pointerClickHandler);
    }
    public void OnPointerEnterXR(){
     GazeManager.Instance.SetUpGaze(1.5f);
     OnXRPointerEnter?.Invoke();
+    if (EventSystem.current == null)
+        return;
     PointerEventData pointerEvent = PlacePointer();
     ExecuteEvents.Execute(this.gameObject,pointerEvent,ExecuteEvents.pointerDownHandler);
    }
    public void OnPointerExitXR(){
     GazeManager.Instance.SetUpGaze(2.5f);
     OnXRPointerExit?.Invoke();
+    if (EventSystem.current == null)
+        return;
     PointerEventData pointerEvent = PlacePointer();
     ExecuteEvents.Execute(this.gameObject,pointerEvent,ExecuteEvents.pointerUpHandler);
    }

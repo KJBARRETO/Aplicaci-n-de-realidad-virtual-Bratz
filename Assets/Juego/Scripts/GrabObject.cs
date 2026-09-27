@@ -20,8 +20,8 @@ public class GrabObject : MonoBehaviour
     void Start()
     {
         player = GetComponent<AudioSource>();
-        spawnerPosition = spawner.transform.position;
-        spawnerRotation = spawner.transform.rotation;
+        spawnerPosition = transform.position;
+        spawnerRotation = transform.rotation;
         boxCollider = GetComponent<BoxCollider>();
         grabManager = GameObject.Find("GrabManager").GetComponent<GrabManager>();
     }

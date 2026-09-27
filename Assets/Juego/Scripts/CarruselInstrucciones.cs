@@ -129,6 +129,14 @@ public class CarruselInstrucciones : MonoBehaviour
 
         GameObject objeto = flecha.gameObject;
         objeto.tag = "Interactable";
+        objeto.layer = 0;
+
+        Vector3 escala = objeto.transform.localScale;
+        if (escala.x < 0f)
+        {
+            objeto.transform.localScale = new Vector3(Mathf.Abs(escala.x), Mathf.Abs(escala.y), Mathf.Abs(escala.z));
+            objeto.transform.Rotate(0f, 180f, 0f);
+        }
 
         RectTransform rect = objeto.GetComponent<RectTransform>();
         BoxCollider caja = objeto.GetComponent<BoxCollider>();
@@ -137,7 +145,7 @@ public class CarruselInstrucciones : MonoBehaviour
         Vector2 tamano = rect.rect.size;
         if (tamano.x < 1f || tamano.y < 1f)
             tamano = rect.sizeDelta;
-        caja.size = new Vector3(Mathf.Abs(tamano.x), Mathf.Abs(tamano.y), 20f);
+        caja.size = new Vector3(Mathf.Abs(tamano.x), Mathf.Abs(tamano.y), 40f);
         caja.center = Vector3.zero;
 
         if (objeto.GetComponent<UiElementXR>() == null)
@@ -198,129 +206,3 @@ public class CarruselInstrucciones : MonoBehaviour
     }
 }
 
-#if UNITY_EDITOR
-[UnityEditor.InitializeOnLoad]
-static class ArmarPistasEnMarco
-{
-    static ArmarPistasEnMarco()
-    {
-        UnityEditor.EditorApplication.delayCall += Armar;
-    }
-
-    static void Armar()
-    {
-        if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-            return;
-
-        GameObject marco = GameObject.Find("marco");
-        if (marco == null || marco.transform.Find("LienzoPistas") != null)
-            return;
-
-        SpriteRenderer sprite = marco.GetComponent<SpriteRenderer>();
-        if (sprite == null || sprite.sprite == null)
-            return;
-
-        UnityEditor.Undo.RegisterFullObjectHierarchyUndo(marco, "Pistas en el marco");
-
-        Vector2 tamano = sprite.sprite.bounds.size;
-        GameObject lienzo = new GameObject("LienzoPistas", typeof(RectTransform));
-        lienzo.layer = marco.layer;
-        lienzo.transform.SetParent(marco.transform, false);
-
-        RectTransform rect = lienzo.GetComponent<RectTransform>();
-        rect.localRotation = Quaternion.Euler(0f, 180f, 0f);
-        rect.localPosition = new Vector3(0f, 0f, 0.15f);
-        rect.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = tamano / 0.01f;
-
-        Canvas canvas = lienzo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
-        canvas.overrideSorting = true;
-        canvas.sortingOrder = 20;
-        UnityEngine.UI.CanvasScaler escala = lienzo.AddComponent<UnityEngine.UI.CanvasScaler>();
-        escala.dynamicPixelsPerUnit = 10f;
-        lienzo.AddComponent<CarruselInstrucciones>();
-
-        float ancho = rect.sizeDelta.x;
-        float alto = rect.sizeDelta.y;
-        CrearTexto(lienzo.transform);
-        CrearImagen(lienzo.transform, "Pista 1", "Assets/Juego/Images/Pista 1.png", false);
-        CrearImagen(lienzo.transform, "Pista 2", "Assets/Juego/Images/Pista 2.png", false);
-        CrearImagen(lienzo.transform, "Pista 3", "Assets/Juego/Images/pista 3.png", false);
-        CrearFlecha(lienzo.transform, "Flecha Izquierda", new Vector2(-ancho * 0.36f, 0f), new Vector2(ancho * 0.12f, alto * 0.16f), true);
-        CrearFlecha(lienzo.transform, "Flecha Derecha", new Vector2(ancho * 0.36f, 0f), new Vector2(ancho * 0.12f, alto * 0.16f), false);
-
-        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(marco.scene);
-    }
-
-    static void CrearTexto(Transform padre)
-    {
-        GameObject objeto = new GameObject("PISTAS", typeof(RectTransform));
-        objeto.layer = padre.gameObject.layer;
-        objeto.transform.SetParent(padre, false);
-        RectTransform rect = objeto.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.22f, 0.7f);
-        rect.anchorMax = new Vector2(0.78f, 0.88f);
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-        rect.localScale = Vector3.one;
-        rect.localRotation = Quaternion.identity;
-
-        objeto.AddComponent<CanvasRenderer>();
-        TextMeshProUGUI texto = objeto.AddComponent<TextMeshProUGUI>();
-        texto.text = "PISTAS";
-        texto.alignment = TextAlignmentOptions.Center;
-        texto.color = new Color(0.35f, 0.08f, 0.28f, 1f);
-        texto.enableAutoSizing = true;
-        texto.fontSizeMin = 28f;
-        texto.fontSizeMax = 96f;
-        texto.raycastTarget = false;
-        texto.font = UnityEditor.AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/TextMesh Pro/Fonts/Marimpa SDF.asset");
-    }
-
-    static void CrearImagen(Transform padre, string nombre, string ruta, bool visible)
-    {
-        GameObject objeto = new GameObject(nombre, typeof(RectTransform));
-        objeto.layer = padre.gameObject.layer;
-        objeto.transform.SetParent(padre, false);
-        RectTransform rect = objeto.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.2f, 0.16f);
-        rect.anchorMax = new Vector2(0.8f, 0.68f);
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-        rect.localScale = Vector3.one;
-        rect.localRotation = Quaternion.identity;
-
-        objeto.AddComponent<CanvasRenderer>();
-        UnityEngine.UI.Image imagen = objeto.AddComponent<UnityEngine.UI.Image>();
-        imagen.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(ruta);
-        imagen.preserveAspect = true;
-        imagen.raycastTarget = false;
-        objeto.SetActive(visible);
-    }
-
-    static void CrearFlecha(Transform padre, string nombre, Vector2 posicion, Vector2 tamano, bool voltear)
-    {
-        GameObject objeto = new GameObject(nombre, typeof(RectTransform));
-        objeto.layer = padre.gameObject.layer;
-        objeto.transform.SetParent(padre, false);
-        RectTransform rect = objeto.GetComponent<RectTransform>();
-        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = posicion;
-        rect.sizeDelta = tamano;
-        rect.localRotation = Quaternion.identity;
-        rect.localScale = voltear ? new Vector3(-1f, 1f, 1f) : Vector3.one;
-
-        objeto.AddComponent<CanvasRenderer>();
-        UnityEngine.UI.Image imagen = objeto.AddComponent<UnityEngine.UI.Image>();
-        imagen.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Juego/Images/FLECHA.png");
-        imagen.preserveAspect = true;
-        imagen.raycastTarget = false;
-        UnityEngine.UI.Button boton = objeto.AddComponent<UnityEngine.UI.Button>();
-        boton.targetGraphic = imagen;
-    }
-}
-#endif
