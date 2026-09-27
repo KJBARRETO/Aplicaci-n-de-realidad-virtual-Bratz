@@ -12,7 +12,8 @@ public class CameraPointerManager : MonoBehaviour
     [SerializeField] private float disPointerObject = 0.95f;
 
 
-    private const float _maxDistance = 30;
+    private const float _maxDistance = 1000;
+    private static readonly RaycastHit[] _hits = new RaycastHit[64];
     private GameObject _gazedAtObject = null;
 
     private readonly string interactableTag = "Interactable";
@@ -46,7 +47,7 @@ public class CameraPointerManager : MonoBehaviour
    public void Update()
    {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, _maxDistance))
+        if (BuscarObjetivo(out hit))
         {
            hitPoint = hit.point;
 
@@ -83,6 +84,41 @@ public class CameraPointerManager : MonoBehaviour
         }
 
           }
+
+        private bool BuscarObjetivo(out RaycastHit elegido)
+        {
+            int cantidad = Physics.RaycastNonAlloc(transform.position, transform.forward, _hits, _maxDistance);
+            bool hayInteractable = false;
+            float distancia = _maxDistance;
+            elegido = default;
+
+            for (int i = 0; i < cantidad; i++)
+            {
+                if (!_hits[i].transform.CompareTag(interactableTag))
+                    continue;
+                if (_hits[i].distance >= distancia)
+                    continue;
+                distancia = _hits[i].distance;
+                elegido = _hits[i];
+                hayInteractable = true;
+            }
+
+            if (hayInteractable)
+                return true;
+
+            bool hayAlgo = false;
+            distancia = _maxDistance;
+            for (int i = 0; i < cantidad; i++)
+            {
+                if (_hits[i].distance >= distancia)
+                    continue;
+                distancia = _hits[i].distance;
+                elegido = _hits[i];
+                hayAlgo = true;
+            }
+
+            return hayAlgo;
+        }
 
         private void PointerOnGaze(Vector3 hitPoint)
         {

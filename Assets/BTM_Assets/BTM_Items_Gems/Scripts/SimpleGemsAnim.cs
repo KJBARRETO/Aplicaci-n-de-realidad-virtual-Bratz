@@ -26,19 +26,53 @@ namespace Benjathemaker
         public bool useEasingForScaling = false; // Separate toggle for scaling ease
         public float scaleLerpSpeed = 1f; // Speed of scaling transition
         private float scaleTimer;
+        GrabManager grabManager;
+        Vector3 spawnPosition;
+        Vector3 escalaGuardada;
+        int capaGuardada;
+        bool estabaAgarrado;
 
         void Start()
         {
             initialScale = transform.localScale;
             initialPosition = transform.position;
+            spawnPosition = initialPosition;
 
             // Adjust start and end scale based on initial scale
             startScale = initialScale;
             endScale = initialScale * (endScale.magnitude / startScale.magnitude);
+
+            GameObject manager = GameObject.Find("GrabManager");
+            if (manager != null)
+                grabManager = manager.GetComponent<GrabManager>();
         }
 
         void Update()
         {
+            bool agarrado = grabManager != null && grabManager.heldItem == gameObject;
+            if (agarrado)
+            {
+                if (!estabaAgarrado)
+                {
+                    escalaGuardada = transform.localScale;
+                    AchicarParaLaMano();
+                }
+                estabaAgarrado = true;
+                return;
+            }
+
+            if (estabaAgarrado)
+            {
+                estabaAgarrado = false;
+                transform.localScale = escalaGuardada;
+                initialPosition = transform.position;
+                CambiarCapa(capaGuardada);
+                CambiarColliders(true);
+            }
+
+            if (Vector3.Distance(transform.position, spawnPosition) > 0.75f)
+                return;
+
             if (isRotating)
             {
                 Vector3 rotationVector = new Vector3(
@@ -70,6 +104,52 @@ namespace Benjathemaker
 
                 transform.localScale = Vector3.Lerp(startScale, endScale, t);
             }
+        }
+
+        void LateUpdate()
+        {
+            if (grabManager == null || grabManager.heldItem != gameObject)
+                return;
+
+            Camera camara = Camera.main;
+            if (camara == null)
+                return;
+
+            transform.position = camara.transform.position
+                + camara.transform.forward * 0.85f
+                + camara.transform.right * 0.42f
+                - camara.transform.up * 0.32f;
+        }
+
+        void AchicarParaLaMano()
+        {
+            capaGuardada = gameObject.layer;
+            CambiarCapa(2);
+            CambiarColliders(false);
+
+            Renderer malla = GetComponentInChildren<Renderer>();
+            if (malla == null)
+                return;
+
+            float tamano = malla.bounds.extents.magnitude;
+            if (tamano <= 0.25f)
+                return;
+
+            transform.localScale = escalaGuardada * (0.25f / tamano);
+        }
+
+        void CambiarCapa(int capa)
+        {
+            Transform[] partes = GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < partes.Length; i++)
+                partes[i].gameObject.layer = capa;
+        }
+
+        void CambiarColliders(bool activos)
+        {
+            Collider[] cajas = GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < cajas.Length; i++)
+                cajas[i].enabled = activos;
         }
 
         float EaseInOutQuad(float t)
