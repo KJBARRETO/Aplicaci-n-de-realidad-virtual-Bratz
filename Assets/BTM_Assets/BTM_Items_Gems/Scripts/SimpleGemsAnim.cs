@@ -46,20 +46,6 @@ namespace Benjathemaker
             GameObject final = GameObject.Find("Final");
             if (final != null && final.GetComponent<SpriteRenderer>() != null && final.GetComponent<SimpleGemsAnim>() == null)
                 final.AddComponent<SimpleGemsAnim>();
-
-            AudioListener.pause = true;
-            AudioSource[] fuentes = Object.FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            for (int i = 0; i < fuentes.Length; i++)
-            {
-                AudioClip clip = fuentes[i].clip;
-                if (clip != null && clip.name.Contains("Gato"))
-                {
-                    fuentes[i].Stop();
-                    fuentes[i].playOnAwake = false;
-                    fuentes[i].clip = null;
-                }
-            }
-            AudioListener.pause = false;
         }
 
         void Start()

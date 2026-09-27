@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &810000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 810000002}
+  - component: {fileID: 810000003}
+  m_Layer: 0
+  m_Name: BocinaCanciones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &810000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &810000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f4a1c8e2b6d4a90b3e5c7d1f9a04e62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canciones:
+  - {fileID: 8300000, guid: def0ecd11f0b0c04694ff30a00340bfa, type: 3}
+  - {fileID: 8300000, guid: 09e873cf3df170c4f946f85b68a62b41, type: 3}
+  - {fileID: 8300000, guid: 3912dfd7ff0cda84f826eee0707086a7, type: 3}
+  - {fileID: 8300000, guid: c53acfde70e5953449ea87257641a25d, type: 3}
+  - {fileID: 8300000, guid: 52ecfcf36fcfe69409c22732f0d1e2f3, type: 3}
+  - {fileID: 8300000, guid: 1ec2a276894169b42aa1fa28c95f8e38, type: 3}
