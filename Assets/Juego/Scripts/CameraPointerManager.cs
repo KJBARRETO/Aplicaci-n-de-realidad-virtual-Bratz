@@ -12,7 +12,7 @@ public class CameraPointerManager : MonoBehaviour
     [SerializeField] private float disPointerObject = 0.95f;
 
 
-    private const float _maxDistance = 1000;
+    private const float _maxDistance = 70;
     private static readonly RaycastHit[] _hits = new RaycastHit[64];
     private GameObject _gazedAtObject = null;
 
