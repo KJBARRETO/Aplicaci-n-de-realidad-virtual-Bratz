@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.google.xr.cardboard": "file:C:/Users/kevin/Downloads/cardboard-xr-plugin-1.19.0/cardboard-xr-plugin-1.19.0",
+    "com.google.xr.cardboard": "file:C:/Users/csalad8/Downloads/cardboard-xr-plugin-1.19.0/cardboard-xr-plugin-1.19.0",
     "com.unity.ai.navigation": "2.0.10",
     "com.unity.burst": "1.8.30",
     "com.unity.collab-proxy": "2.11.3",
